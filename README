@@ -1,0 +1,50 @@
+This is a tool, which will take image attachments from email sent by Photobooth software
+
+	Primary files included
+	index.pl
+		This is used for web server
+
+	parseemail.pl
+		This is a link to index.pl, used to process the incoming email
+
+	photobooth-event.config
+		Example configuration file for each event
+
+	photobooth.css
+		Sample CSS to control fonts
+
+	README
+		This file
+
+
+	Directory Structure, from web home directory. This ia view of the relative paths
+		PhotoBooth/scripts/
+			index.pl
+			photobooth-event.config
+			photobooth.css
+			index.html			# This is an optional file (not included), you may want to static file for your site.
+		PhotoBooth/Events/
+			index.html			# This is an optional file (not included), you may want to static file for your site.
+
+			# Setup on of these for each event
+		PhotoBooth/Events/SpecificEvent		# This is the top level for each event
+			index.pl			# This can be a copy or a link to the actual index.pl file in the scripts directory
+			photobooth.css			# This can be link to the photobooth.css in the scripts directory. A local copy can be used
+			photobooth-event.config		# The configuration file for this PhotoBooth event
+			Photos/				# Directory where the full size image file
+				index.pl		# This should be a link to the index.pl file, such as index.pl => ../index.pl
+				photobooth-event.config	# This hould be a link to the photobooth-event.config, such as photobooth-event.config => ../photobooth-event.config
+			Samples/			# A small version of the image file to reduce page size
+				index.pl		# This should be a link to the index.pl file, such as index.pl => ../index.pl
+				photobooth-event.config	# This hould be a link to the photobooth-event.config, such as photobooth-event.config => ../photobooth-event.config
+			QRcodes/			# QRcodes for each of the image file
+				index.pl		# This should be a link to the index.pl file, such as index.pl => ../index.pl
+				photobooth-event.config	# This hould be a link to the photobooth-event.config, such as photobooth-event.config => ../photobooth-event.config
+			TempSpace/			# Temporary storage/processing are for the incoming messages
+
+			The link of index.pl and photobooth-event.config are used to prevent people looking at the index of this directories (Photos/Samples/QRcodes)
+				But it is not required for TempSpace as it should be empty and only used while processing emails
+
+		Setup an email alias for each event, this is base on the /etc/mail/alias file in Sendmail
+			PhotoBoothEvent:  "|( cd /WebDirecoty/www.example.com/htdocs/PhotoBooth/Events/PhotoBoothEvent; ./parseemail.pl )"
+
