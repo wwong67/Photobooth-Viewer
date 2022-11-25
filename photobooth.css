@@ -1,8 +1,26 @@
-.banner
+.Banner
 {
 	#font-size: 30px;
 	font-size: 3.5vw;
-	font-family: "Times New Roman", Times, serif;
+#	font-family: "Times New Roman", Times, serif;
+	font-family: helvetica, sans-serif;
+	text-align: center;
+}
+
+.Event
+{
+	#font-size: 30px;
+	font-size: 3.5vw;
+#	font-family: "Times New Roman", Times, serif;
+	font-family: helvetica, sans-serif;
+	text-align: center;
+}
+
+.EventInfo
+{
+	font-size: 1.5vw;
+#	font-family: "Times New Roman", Times, serif;
+	font-family: helvetica, sans-serif;
 	text-align: center;
 }
 

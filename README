@@ -11,7 +11,7 @@ This is a tool, which will take image attachments from email sent by Photobooth 
 		Example configuration file for each event
 
 	photobooth.css
-		Sample CSS to control fonts
+		CSS to control html display. a local copy on each event to fine tune the display
 
 	README
 		This file

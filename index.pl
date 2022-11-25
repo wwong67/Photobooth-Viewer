@@ -20,6 +20,7 @@ use Imager::QRCode;
 my $basedir = "/PhotoBooth/Events/EventName";
 my $URL = "https://www.example.com/PhotoBooth/Events/EventName";
 my $eventname = "Event name";
+my $eventinfo = "";
 my $photos = "Photos";
 my $samples = "Samples";
 my $qrcodes = "QRcodes";
@@ -62,6 +63,7 @@ sub readConfig
 		if ( $name and $name eq "samples" ) { $samples = "$value" };
 		if ( $name and $name eq "qrcodes" ) { $qrcodes = "$value" };
 		if ( $name and $name eq "eventname" ) { $eventname = "$value" };
+		if ( $name and $name eq "eventinfo" ) { $eventinfo = "$value" };
 		if ( $name and $name eq "URL" ) { $URL = "$value" };
 		if ( $name and $name eq "samplesize" ) { $samplesize = "$value" };
 		if ( $name and $name eq "imagelogo" ) { $imagelogo = "$value" };
@@ -281,8 +283,13 @@ sub showBanner
 	print "<TR>\n";
 	if ( $imagelogo ) { print "<TD WIDTH=12%><IMG SRC='$imagelogo' WIDTH=100% $align></TD>\n"; }
 
-	print "<TH WIDTH=75% CLASS=banner>";
-	print "$eventname";
+	print "<TH WIDTH=75% CLASS=Banner>";
+	print "<FONT CLASS=Event>$eventname</FONT>";
+	if ( $eventinfo )
+	   {
+		print "<BR>\n";
+		print "<FONT CLASS=EventInfo>$eventinfo</FONT>";
+	   }
 
 	print "<HR WIDTH=75%>\n";
 	print "<FONT CLASS=refresh>";
