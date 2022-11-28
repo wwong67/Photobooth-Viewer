@@ -1,4 +1,11 @@
-This is a tool, which will take image attachments from email sent by Photobooth software
+This is a tool, which will take image attachments from email sent by Photobooth software as MIME file
+
+It requires the following
+	ImageMagick
+	Perl and the following modules
+		MIME::Parser;
+		Imager::QRCode;
+		CGI
 
 	Primary files included
 	index.pl
@@ -9,9 +16,15 @@ This is a tool, which will take image attachments from email sent by Photobooth 
 
 	photobooth-event.config
 		Example configuration file for each event
+			Event information and display
+			Image settings, including watermark
+			Passcode for image download
 
 	photobooth.css
 		CSS to control html display. a local copy on each event to fine tune the display
+
+	htaccess
+		This is an example .htaccess file that should go into the "Photos" directory, to prevent downloads
 
 	README
 		This file
@@ -34,6 +47,8 @@ This is a tool, which will take image attachments from email sent by Photobooth 
 			Photos/				# Directory where the full size image file
 				index.pl		# This should be a link to the index.pl file, such as index.pl => ../index.pl
 				photobooth-event.config	# This hould be a link to the photobooth-event.config, such as photobooth-event.config => ../photobooth-event.config
+				and/or
+				.htaccess		# There is an example file. This needs to be edited
 			Samples/			# A small version of the image file to reduce page size
 				index.pl		# This should be a link to the index.pl file, such as index.pl => ../index.pl
 				photobooth-event.config	# This hould be a link to the photobooth-event.config, such as photobooth-event.config => ../photobooth-event.config
