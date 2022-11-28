@@ -230,11 +230,11 @@ sub showPhotos
 		print "</FONT>\n";
 		print "<HR WIDTH=85%>\n";
 		print "<IMG SRC='QRcodes/$qrfile' WIDTH='100%' $align>\n";
-		print "<FONT CLASS=QRDownload>";
-		print "<A HREF='index.pl?function=download&photo=$photo'>Scan QR code or click to download</A>\n";
-		print "</FONT>\n";
 
-		print "<BR>";
+		print "<FONT CLASS=QRDownload>";
+		print "<A HREF='index.pl?function=download&photo=$photo'>Scan QR code or click to download</A></FONT>\n";
+		if ( $eventpasscode ) { print "<FONT CLASS=QRDownloadPassCode>(Passcode required)</FONT>\n" };
+
 		print "</TD>\n";
 		print "</TR>\n";
 		print "</TABLE>\n";

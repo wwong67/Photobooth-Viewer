@@ -9,8 +9,7 @@
 
 .Event
 {
-	#font-size: 30px;
-	font-size: 3.5vw;
+	font-size: 4.0vw;
 #	font-family: "Times New Roman", Times, serif;
 	font-family: helvetica, sans-serif;
 	text-align: center;
@@ -33,7 +32,6 @@
 
 .PhotoTaken
 {
-        #font-size: 16pt;
 	font-size: 1.6vw;
 	font-family: helvetica, sans-serif;
         text-align: center;
@@ -41,8 +39,14 @@
 
 .QRDownload
 {
-        #font-size: 14pt;
-	font-size: 1.4vw;
+	font-size: 1.3vw;
+	font-family: helvetica, sans-serif;
+        text-align: center;
+}
+
+.QRDownloadPassCode
+{
+	font-size: 1.0vw;
 	font-family: helvetica, sans-serif;
         text-align: center;
 }
