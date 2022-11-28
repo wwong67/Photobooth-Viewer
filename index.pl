@@ -21,13 +21,20 @@ my $basedir = "/PhotoBooth/Events/EventName";
 my $URL = "https://www.example.com/PhotoBooth/Events/EventName";
 my $eventname = "Event name";
 my $eventinfo = "";
+my $eventpasscode = "";
 my $photos = "Photos";
 my $samples = "Samples";
 my $qrcodes = "QRcodes";
 my $tempspace = "TempSpace";
 my $parser = "parseemail.pl";
 my $samplesize = 400;
-my $imagelogo = "";
+my $imagelogoleft = "";
+my $imagelogoright = "";
+my $bannertextwidth="80%";
+my $imagelogoleftwidth="10%";
+my $imagelogorightwidth="10%";
+my $watermarkimage="";
+my $configfile = "./photobooth-event.config";
 
 # This is a combine script to run email parsing and web pages
 if ( grep ( /$parser/, $0 ) )
@@ -64,9 +71,15 @@ sub readConfig
 		if ( $name and $name eq "qrcodes" ) { $qrcodes = "$value" };
 		if ( $name and $name eq "eventname" ) { $eventname = "$value" };
 		if ( $name and $name eq "eventinfo" ) { $eventinfo = "$value" };
+		if ( $name and $name eq "eventpasscode" ) { $eventpasscode = "$value" };
 		if ( $name and $name eq "URL" ) { $URL = "$value" };
 		if ( $name and $name eq "samplesize" ) { $samplesize = "$value" };
-		if ( $name and $name eq "imagelogo" ) { $imagelogo = "$value" };
+		if ( $name and $name eq "bannertextwidth" ) { $bannertextwidth = "$value" };
+		if ( $name and $name eq "imagelogoleft" ) { $imagelogoleft = "$value" };
+		if ( $name and $name eq "imagelogoright" ) { $imagelogoright = "$value" };
+		if ( $name and $name eq "imagelogoleftwidth" ) { $imagelogoleftwidth = "$value" };
+		if ( $name and $name eq "imagelogorightwidth" ) { $imagelogorightwidth = "$value" };
+		if ( $name and $name eq "watermarkimage" ) { $watermarkimage = "$value" };
 	   }
 }
 
@@ -184,7 +197,7 @@ sub showPhotos
 	my $div;
 
 	print "<CENTER>\n"; 
-	for $photo ( `( cd $basedir/$samples ; ls -t *.jpg *.JPG *.jpeg *.JPEG)` )
+	for $photo ( `( cd $basedir/$photos ; ls -t *.jpg *.JPG *.jpeg *.JPEG)` )
 	   {
 		chomp ( $photo );
 		$qrfile = $photo;
@@ -279,11 +292,11 @@ sub showBanner
 
 	print "<CENTER>\n";
 	print "<DIV ID=banner>\n";
-	print "<TABLE WIDTH=95%>\n";
+	print "<TABLE WIDTH=95% BORDER=0>\n";
 	print "<TR>\n";
-	if ( $imagelogo ) { print "<TD WIDTH=12%><IMG SRC='$imagelogo' WIDTH=100% $align></TD>\n"; }
+	if ( $imagelogoleft ) { print "<TD WIDTH=$imagelogoleftwidth><IMG SRC='$imagelogoleft' WIDTH=100% $align></TD>\n"; }
 
-	print "<TH WIDTH=75% CLASS=Banner>";
+	print "<TH WIDTH=$bannertextwidth CLASS=Banner>";
 	print "<FONT CLASS=Event>$eventname</FONT>";
 	if ( $eventinfo )
 	   {
@@ -301,7 +314,7 @@ sub showBanner
 	print "</FONT>";
 	print "</TH>\n";
 
-	if ( $imagelogo ) { print "<TD WIDTH=12%><IMG SRC='$imagelogo' WIDTH=100% $align></TD>\n"; }
+	if ( $imagelogoright ) { print "<TD WIDTH=$imagelogorightwidth><IMG SRC='$imagelogoright' WIDTH=100% $align></TD>\n"; }
 	print "</TR>\n";
 	print "</TABLE>\n";
 	print "</DIV>\n";
@@ -316,11 +329,35 @@ sub HTMLEnd
         print "</HTML>\n";
 }
 
+sub askForPassCode
+{
+	# Someday, this should be made nicer
+	my $key;
+
+	print "<CENTER>\n";
+	print "<FORM METHOD=POST ACTION=$self>";
+	print "Event Passcode for download: <INPUT TYPE=INPUT NAME=passcode VALUE=''>\n";
+
+	for $key ( keys (%in) )
+	   {
+		chomp ( $key );
+		if ( $key ne "passcode" )
+		   {
+			print "<INPUT TYPE=HIDDEN NAME=$key VALUE='$in{$key}'>\n";
+		   }
+	   }
+
+	print "<INPUT TYPE=SUBMIT VALUE=Submit>\n";
+	print "</FORM>";
+	print "</CENTER>\n";
+}
+
 sub WebDisplay
 {
+	# Main start function for displaying the web pages
 	use Cwd;
 	my $dir = getcwd;
-	readConfig ( "photobooth-events.config" );
+	readConfig ( "$configfile" );
 
 	# If this script is not in the basedir, send a redirect
 	if ( $dir ne $basedir )
@@ -331,15 +368,27 @@ sub WebDisplay
 
 	if ( $in{function} and $in{function} eq "download" and $in{photo} )
 	   {
+		if ( $eventpasscode and $in{passcode} and $in{passcode} eq $eventpasscode )
+		   {
+			downloadFile ( $in{photo} );
+			exit ();
+		   }
+		if ( $eventpasscode )
+		   {
+			HTMLStart ();
+			askForPassCode ();
+			HTMLEnd ();
+			exit ();
+		   }
 		downloadFile ( $in{photo} );
 	   }
-	   else
-	   {
-		HTMLStart ();
-		showBanner ();
-		showPhotos ( );
-		HTMLEnd ();
-	   }
+
+
+	# Default, show the pages
+	HTMLStart ();
+	showBanner ();
+	showPhotos ( );
+	HTMLEnd ();
 }
 
 
@@ -397,6 +446,8 @@ sub generateQRcode
 sub processFiles
 {
 	my $file;
+	my $convert = "/usr/bin/convert";
+	my $composite = "/usr/bin/composite";
 
 	# Process and move file
 	for $file ( `( cd $basedir/$tempspace/ ; ls )` )
@@ -407,7 +458,12 @@ sub processFiles
 		   {
 			generateQRcode ( $file );
 			`/bin/mv $basedir/$tempspace/$file $basedir/$photos/`;
-			`/usr/bin/convert -quality 99 -resize '$samplesize>x$samplesize>' $basedir/$photos/$file $basedir/$samples/$file`;
+			`$convert -quality 99 -resize '$samplesize>x$samplesize>' $basedir/$photos/$file $basedir/$samples/$file`;
+
+			if ( $watermarkimage )
+			   {
+				`$composite -gravity Center $basedir/$watermarkimage $basedir/$samples/$file $basedir/$samples/$file`;
+			   }
 		   }
 		`/bin/rm -f $basedir/$tempspace/$file`;
 	  }
@@ -428,7 +484,6 @@ sub readSTDIN
 sub parseEmail
 {
 
-	my $configfile = "./photobooth-events.config";
 	if ( $ARGV[0] ) { $configfile = "$ARGV[0]"; }
 
 	readConfig ( "$configfile" );

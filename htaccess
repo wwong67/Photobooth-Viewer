@@ -1,0 +1,2 @@
+# Redirect to a different domain
+RewriteRule ^(.*)$ https://www..example.com/PhotoBooth/Events/EventName/ [R,L]
