@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 #	Creator:	Wai wong (wwong@mmnet.com
 #	Date:		Hov 10, 2022
@@ -11,6 +11,8 @@ use warnings;
 # Perl modules needed for the Web Browser part
 use CGI ':standard';
 use CGI qw(:cgi-lib);
+use CGI::Carp qw ( fatalsToBrowser );
+use File::Basename;
 
 # Perl modules needed for parsing emails
 use MIME::Parser;
@@ -35,6 +37,12 @@ my $imagelogoleftwidth="10%";
 my $imagelogorightwidth="10%";
 my $watermarkimage="";
 my $configfile = "./photobooth-event.config";
+my $uploadkey = 'media';
+my $uploadfilename = 'SomeFile';
+my $uploadusername = 'SomeUser';
+my $uploadpassword = 'SomePassword';
+my $uploadresponse = 'JSON';
+my $uploadmaxsize = 2048;
 
 # This is a combine script to run email parsing and web pages
 if ( grep ( /$parser/, $0 ) )
@@ -49,9 +57,12 @@ my $self = "none";
 my $usediv = 0; # This is for the future using DIV to create blocks
 
 if ( $ENV{SCRIPT_NAME} ) { $self = $ENV{SCRIPT_NAME}; }
-WebDisplay ();
+WebProcess ();
 
-# Functions starts here
+#####
+# Shared functions starts here
+#####
+
 sub readConfig
 {
 	my $config = shift @_;
@@ -64,6 +75,7 @@ sub readConfig
 	   {
 		chomp ( $line );
 		( $name, $value, $junk ) = split ( '=', $line );
+		chomp ( $value );
 
 		if ( $name and $name eq "basedir" ) { $basedir = "$value" };
 		if ( $name and $name eq "photos" ) { $photos = "$value" };
@@ -80,6 +92,12 @@ sub readConfig
 		if ( $name and $name eq "imagelogoleftwidth" ) { $imagelogoleftwidth = "$value" };
 		if ( $name and $name eq "imagelogorightwidth" ) { $imagelogorightwidth = "$value" };
 		if ( $name and $name eq "watermarkimage" ) { $watermarkimage = "$value" };
+		if ( $name and $name eq "uploadkey" ) { $uploadkey = "$value" };
+		if ( $name and $name eq "uploadfilename" ) { $uploadfilename = "$value" };
+		if ( $name and $name eq "uploadusername" ) { $uploadusername = "$value" };
+		if ( $name and $name eq "uploadpassword" ) { $uploadpassword = "$value" };
+		if ( $name and $name eq "uploadresponse" ) { $uploadresponse = "$value" };
+		if ( $name and $name eq "uploadmaxsize" ) { $uploadmaxsize = "$value" };
 	   }
 }
 
@@ -105,7 +123,10 @@ sub readFile
 	return ( @temp );
 }
 
+#####
 # Web Functions starts here
+#####
+
 sub HTMLreload
 {
 	# In seconds
@@ -155,7 +176,7 @@ sub getPhotoDateTime
 		$minute = "$temp[2]$temp[3]";
 		$second = "$temp[4]$temp[5]";
 
-		if ( $year, $month, $day, $hour, $minute, $second )
+		if ( $year and $month and $day and $hour and $minute and $second )
 		   { return ( $year, $month, $day, $hour, $minute, $second ); }
 	   }
 
@@ -204,7 +225,7 @@ sub showPhotos
 		$qrfile =~ s/jpg/gif/;
 		$qrfile =~ s/JPG/GIF/;
 		$qrfile =~ s/jpeg/gif/;
-		$qrfile =~ s/JPEG/GIF/;
+		$qrfile =~ s/JPEG/GIFGIF/;
 
 		if ( $usediv )
 		   {
@@ -232,7 +253,7 @@ sub showPhotos
 		print "<IMG SRC='QRcodes/$qrfile' WIDTH='100%' $align>\n";
 
 		print "<FONT CLASS=QRDownload>";
-		print "<A HREF='index.pl?function=download&photo=$photo'>Scan QR code or click to download</A></FONT>\n";
+		print "<A HREF='$self?function=download&photo=$photo'>Scan QR code or click to download</A></FONT>\n";
 		if ( $eventpasscode ) { print "<FONT CLASS=QRDownloadPassCode>(Passcode required)</FONT>\n" };
 
 		print "</TD>\n";
@@ -265,6 +286,8 @@ sub sendRedirect
 {
 	print "Location: $URL\n\n";
 	print "Content-type: text/html\n\n";
+
+	return;
 }
 
 sub HTMLStart
@@ -352,7 +375,85 @@ sub askForPassCode
 	print "</CENTER>\n";
 }
 
-sub WebDisplay
+sub getUpLoadFile
+{
+	my $username;
+	my $password;
+	my $success;
+	my $errormessage = "Error upload failed.";
+
+	my $query = new CGI;
+	my $photo = $query->param("$uploadkey");
+	my $uploadfilehandle;
+
+	# Set the max filesize before starting
+	$CGI::POST_MAX = 1024 * $uploadmaxsize;
+
+	if ( $in{username} ) { $username = $in{username} }
+	if ( $in{password} ) { $password = $in{password} }
+
+	if ( $uploadusername ne $username ) { $errormessage = "Username/Password failed" }
+	if ( $uploadpassword ne $password ) { $errormessage = "Username/Password failed" }
+
+	if ( $username and $password and $uploadusername and $uploadpassword and $uploadusername eq $username and $uploadpassword eq $password )
+	   {
+		# Get the upload file
+		$uploadfilehandle = $query->upload("$uploadkey");
+		open ( UPLOADFILE, ">$basedir/$tempspace/$photo" ) or die "$!";
+		binmode UPLOADFILE;
+		while ( <$uploadfilehandle> )
+		   {
+			print UPLOADFILE;
+		   }
+		close UPLOADFILE;
+		processFiles ();
+		$success=1;
+	   }
+
+	if ( $uploadresponse eq "JSON" )
+	   {
+		#
+        	print "Content-Type: application/json\n\n";
+
+		print "{\n";
+		if ( $success )
+		   {
+   			print "\"status\": true,\n";
+   			print "\"error\": \"Upload Successful\",\n";
+   			print "\"url\": \"$URL/?function=download&photo=$photo\"\n";
+		   } else
+		   {
+   			print "\"status\": false,\n";
+   			print "\"error\": \"$errormessage\"\n";
+		   }
+		print "}\n";
+		return ();
+	   }
+
+	if ( $uploadresponse eq "XML" )
+	   {
+		#
+        	print "Content-Type: application/xhtml+xml\n\n";
+		print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+		if ( $success )
+		   {
+			print "<rsp status=\"ok\" url=\"$URL/$self?function=download&photo=$photo\" >\n";
+			print "<err msg=\"Upload Successful\" />\n";
+		   } else
+		   {
+			print "<rsp status=\"fail\" >\n";
+			print "<err msg=\"$errormessage\" />\n";
+		   }
+		print "</rsp>\n";
+		return ();
+	   }
+
+	# Last action of upload to send a redirect to the basepage, as there is no forms page for this.
+	sendRedirect ();
+	return ();
+}
+
+sub WebProcess
 {
 	# Main start function for displaying the web pages
 	use Cwd;
@@ -366,6 +467,7 @@ sub WebDisplay
 		exit ();
 	   };
 
+	# If this is for the download, handle it here
 	if ( $in{function} and $in{function} eq "download" and $in{photo} )
 	   {
 		if ( $eventpasscode and $in{passcode} and $in{passcode} eq $eventpasscode )
@@ -383,6 +485,12 @@ sub WebDisplay
 		downloadFile ( $in{photo} );
 	   }
 
+	# If this is for upload
+	if ( $in{$uploadkey} )
+	   {
+		getUpLoadFile ();
+		exit ();
+	   }
 
 	# Default, show the pages
 	HTMLStart ();
@@ -391,8 +499,10 @@ sub WebDisplay
 	HTMLEnd ();
 }
 
-
+#####
 # Web functions for Email parsing starts here
+#####
+
 sub processEmail
 {
 	my $MESSAGE = shift @_;
@@ -426,9 +536,9 @@ sub generateQRcode
 	my $file = shift @_;
 	my $qrfile = "$basedir/$qrcodes/$file";
 	$qrfile =~ s/jpg/gif/;
-	$qrfile =~ s/JPG/gif/;
+	$qrfile =~ s/JPG/GIF/;
 	$qrfile =~ s/jpeg/gif/;
-	$qrfile =~ s/JPEG/gif/;
+	$qrfile =~ s/JPEG/GIF/;
 
 	my $qrcode = Imager::QRCode->new(
 		size		=> 10,
@@ -492,6 +602,6 @@ sub parseEmail
 	if ( $data )
 	   {
 		processEmail ( $data ); 
-		processFiles;
+		processFiles ();
 	   }
 }
