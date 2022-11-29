@@ -1,11 +1,11 @@
 This is a tool, which will take image attachments from email sent by Photobooth software as MIME file
 
 It requires the following
-	ImageMagick
+	ImageMagick		# https://imagemagick.org/
 	Perl and the following modules
-		MIME::Parser;
-		Imager::QRCode;
-		CGI
+		MIME::Parser	# https://metacpan.org/pod/MIME::Parser
+		Imager::QRCode	# https://metacpan.org/pod/Imager::QRCode
+		CGI		# https://metacpan.org/pod/CGI
 
 	Primary files included
 	index.pl
@@ -17,7 +17,7 @@ It requires the following
 	photobooth-event.config
 		Example configuration file for each event
 			Event information and display
-			Image settings, including watermark
+			Image settings, including watermark (this should be an transparent image)
 			Passcode for image download
 
 	photobooth.css
@@ -60,6 +60,19 @@ It requires the following
 			The link of index.pl and photobooth-event.config are used to prevent people looking at the index of this directories (Photos/Samples/QRcodes)
 				But it is not required for TempSpace as it should be empty and only used while processing emails
 
-		Setup an email alias for each event, this is base on the /etc/mail/alias file in Sendmail
-			PhotoBoothEvent:  "|( cd /WebDirecoty/www.example.com/htdocs/PhotoBooth/Events/PhotoBoothEvent; ./parseemail.pl )"
+		
+There are two options of uploading
+	Email, using aliases and sendmail
+		Setup an email alias for each event, this is an example using aliases on /etc/mail/alias file with Sendmail
+
+		There will be one entry per event
+			PhotoBoothEventOne:  "|( cd /WebDirecoty/www.example.com/htdocs/PhotoBooth/Events/PhotoBoothEventOne; ./parseemail.pl )"
+			PhotoBoothEventTwo:  "|( cd /WebDirecoty/www.example.com/htdocs/PhotoBooth/Events/PhotoBoothEventTwo; ./parseemail.pl )"
+
+	HTTP(S) Upload
+		This is a POST to https://www.example.com/htdocs/PhotoBooth/Events/PhotoBoothEventOne
+		with the following data in the POST Body
+			username
+			password
+			photo=filename
 
