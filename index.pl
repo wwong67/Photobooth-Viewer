@@ -437,7 +437,7 @@ sub getUpLoadFile
 		print "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 		if ( $success )
 		   {
-			print "<rsp status=\"ok\" url=\"$URL/$self?function=download&photo=$photo\" >\n";
+			print "<rsp status=\"ok\" url=\"$URL/?function=download&photo=$photo\" >\n";
 			print "<err msg=\"Upload Successful\" />\n";
 		   } else
 		   {
