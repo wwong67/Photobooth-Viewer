@@ -553,11 +553,37 @@ sub generateQRcode
 	$img->write(file => "$qrfile"); # or die "Failed to write: " . $img->errstr;
 }
 
+sub checkFileName
+{
+	my $filename = shift @_;
+	my $newfile = $filename;
+
+	my $count = 1;
+	my $max = 100;
+	my $base;
+	my $extension;
+
+#	( $base, $extension ) = split ( '\.', $filename, 2 );
+	( $extension, $base ) = split ( '\.', reverse ( $filename ), 2 );
+	$extension = reverse ( $extension );
+	$base = reverse ( $base );
+
+	while ( $count < $max and -f "$basedir/$photos/$newfile" )
+	   {
+		# Found a file with the same name
+		$newfile = "${base}-${count}.$extension";
+		$count++;
+	   }
+
+	return ( $newfile );
+}
+
 sub processFiles
 {
 	my $file;
 	my $convert = "/usr/bin/convert";
 	my $composite = "/usr/bin/composite";
+	my $checkedname;
 
 	# Process and move file
 	for $file ( `( cd $basedir/$tempspace/ ; ls )` )
@@ -566,13 +592,14 @@ sub processFiles
 
 		if ( grep ( /.JPG|JPEG/i, $file ) )
 		   {
-			generateQRcode ( $file );
-			`/bin/mv $basedir/$tempspace/$file $basedir/$photos/`;
-			`$convert -quality 99 -resize '$samplesize>x$samplesize>' $basedir/$photos/$file $basedir/$samples/$file`;
+			$checkedname = checkFileName ( $file );
+			generateQRcode ( $checkedname );
+			`/bin/mv $basedir/$tempspace/$file $basedir/$photos/$checkedname`;
+			`$convert -quality 99 -resize '$samplesize>x$samplesize>' $basedir/$photos/$checkedname $basedir/$samples/$checkedname`;
 
 			if ( $watermarkimage )
 			   {
-				`$composite -gravity Center $basedir/$watermarkimage $basedir/$samples/$file $basedir/$samples/$file`;
+				`$composite -gravity Center $basedir/$watermarkimage $basedir/$samples/$checkedname $basedir/$samples/$checkedname`;
 			   }
 		   }
 		`/bin/rm -f $basedir/$tempspace/$file`;
