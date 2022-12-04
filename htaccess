@@ -1,2 +1,5 @@
 # Redirect to a different domain
-RewriteRule ^(.*)$ https://www..example.com/PhotoBooth/Events/EventName/ [R,L]
+RewriteRule photobooth-event.config https://www.example.com/PhotoBooth/Events/SampleEvent/ [R,L]
+RewriteRule Photos/ https://www.example.com/PhotoBooth/Events/SampleEvent/ [R,L]
+RewriteRule QRcodes/ https://www.example.com/PhotoBooth/Events/SampleEvent/ [R,L]
+RewriteRule TempSpace/ https://www.example.com/PhotoBooth/Events/SampleEvent/ [R,L]
