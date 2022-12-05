@@ -24,7 +24,8 @@ It requires the following
 		CSS to control html display. a local copy on each event to fine tune the display
 
 	htaccess
-		This is an example .htaccess file that should go into the "Photos" directory, to prevent downloads
+		This is an example .htaccess file that should go into the "Events/SampleEvent" directory, to prevent downloads
+			Do not add Samples and QRcodes to the list in the htaccess file
 
 	README
 		This file
@@ -40,26 +41,15 @@ It requires the following
 			index.html			# This is an optional file (not included), you may want to static file for your site.
 
 			# Setup on of these for each event
-		PhotoBooth/Events/SpecificEvent		# This is the top level for each event
+		PhotoBooth/Events/SampleEvent		# This is the top level for each event
 			index.pl			# This can be a copy or a link to the actual index.pl file in the scripts directory
 			photobooth.css			# This can be link to the photobooth.css in the scripts directory. A local copy can be used
 			photobooth-event.config		# The configuration file for this PhotoBooth event
+			.htaccess			# This is access file for the event, take the sample and edit for this URL
 			Photos/				# Directory where the full size image file
-				index.pl		# This should be a link to the index.pl file, such as index.pl => ../index.pl
-				photobooth-event.config	# This hould be a link to the photobooth-event.config, such as photobooth-event.config => ../photobooth-event.config
-				and/or
-				.htaccess		# There is an example file. This needs to be edited
 			Samples/			# A small version of the image file to reduce page size
-				index.pl		# This should be a link to the index.pl file, such as index.pl => ../index.pl
-				photobooth-event.config	# This hould be a link to the photobooth-event.config, such as photobooth-event.config => ../photobooth-event.config
 			QRcodes/			# QRcodes for each of the image file
-				index.pl		# This should be a link to the index.pl file, such as index.pl => ../index.pl
-				photobooth-event.config	# This hould be a link to the photobooth-event.config, such as photobooth-event.config => ../photobooth-event.config
 			TempSpace/			# Temporary storage/processing are for the incoming messages
-
-			The link of index.pl and photobooth-event.config are used to prevent people looking at the index of this directories (Photos/Samples/QRcodes)
-				But it is not required for TempSpace as it should be empty and only used while processing emails
-
 		
 There are two options of uploading
 	Email, using aliases and sendmail
