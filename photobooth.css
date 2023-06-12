@@ -1,52 +1,62 @@
 .Banner
 {
-	#font-size: 30px;
 	font-size: 3.5vw;
-#	font-family: "Times New Roman", Times, serif;
-	font-family: helvetica, sans-serif;
+	font-family: "Times New Roman", Times, serif;
+#	font-family: helvetica, sans-serif;
+	font-weight: normal;
 	text-align: center;
 }
 
 .Event
 {
 	font-size: 4.0vw;
-#	font-family: "Times New Roman", Times, serif;
-	font-family: helvetica, sans-serif;
+	font-family: "Times New Roman", Times, serif;
+#	font-family: helvetica, sans-serif;
+	font-weight: normal;
 	text-align: center;
 }
 
 .EventInfo
 {
 	font-size: 1.5vw;
-#	font-family: "Times New Roman", Times, serif;
-	font-family: helvetica, sans-serif;
+	font-family: "Times New Roman", Times, serif;
+#	font-family: helvetica, sans-serif;
+	font-weight: normal;
 	text-align: center;
 }
 
 .refresh
 {
 	font-size: 1.0vw;
-	font-family: helvetica, sans-serif;
+	font-family: "Times New Roman", Times, serif;
+#	font-family: helvetica, sans-serif;
+	font-weight: normal;
 	text-align: center;
 }
 
 .PhotoTaken
 {
 	font-size: 1.6vw;
-	font-family: helvetica, sans-serif;
+	font-family: "Times New Roman", Times, serif;
+#	font-family: helvetica, sans-serif;
+	font-weight: normal;
         text-align: center;
 }
 
 .QRDownload
 {
 	font-size: 1.3vw;
-	font-family: helvetica, sans-serif;
+	font-family: "Times New Roman", Times, serif;
+#	font-family: helvetica, sans-serif;
+	font-weight: normal;
         text-align: center;
 }
 
 .QRDownloadPassCode
 {
 	font-size: 1.0vw;
-	font-family: helvetica, sans-serif;
+	font-family: "Times New Roman", Times, serif;
+#	font-family: helvetica, sans-serif;
+	font-weight: normal;
         text-align: center;
 }
