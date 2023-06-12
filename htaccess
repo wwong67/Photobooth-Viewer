@@ -1,4 +1,5 @@
 # Redirect to a different domain
+# Do not add "Samples" to this list
 RewriteRule photobooth-event.config https://www.example.com/PhotoBooth/Events/SampleEvent/ [R,L]
 RewriteRule Photos/ https://www.example.com/PhotoBooth/Events/SampleEvent/ [R,L]
 RewriteRule TempSpace/ https://www.example.com/PhotoBooth/Events/SampleEvent/ [R,L]

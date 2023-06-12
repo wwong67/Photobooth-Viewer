@@ -1,11 +1,22 @@
-This is a tool, which will take image attachments from email sent by Photobooth software as MIME file
+This is a tool, which will take image attachments from email sent by Photobooth software as MIME file or an upload (preferred method)
 
 It requires the following
-	ImageMagick		# https://imagemagick.org/
+	ImageMagick		# https://imagemagick.org/, this is used to process for images to create sample files
+	ffmpeg			# https://ffmpeg.org/, this is used to process for videos to create sample and poster files
 	Perl and the following modules
-		MIME::Parser	# https://metacpan.org/pod/MIME::Parser
+		MIME::Parser	# https://metacpan.org/pod/MIME::Parser, used by the email parser
 		Imager::QRCode	# https://metacpan.org/pod/Imager::QRCode
 		CGI		# https://metacpan.org/pod/CGI
+
+	Web Server:
+		Apache server was used, but should run on any Linux style platform, but not tested.
+		Written in Perl, with the idea to use the libraries listed above, should run on most perl installs
+
+	Hosting:
+		Internet speed. Tested on 20 Mbupload, and 100Mb download
+			The 20 Mb seems more than fast enough for serving these pages, with IMG lazy loading, and Video using preload=none and poster files
+			If lazy loading is not enabled or the browser (old one) does not support it, that can been seen as slower
+		Server: Coded on Ubuntu, but it is generic that it should work on most Linux platforms with Perl/Apache
 
 	Primary files included
 	index.pl
@@ -14,16 +25,26 @@ It requires the following
 	parseemail.pl
 		This is a link to index.pl, used to process the incoming email
 
+	processTempSpace.pl
+		This is a link to index.pl, used to process any additional photos added to the TempSpace directory listed below
+		run the command as "./processTempSpace.pl" to process file from the TempSpace directory
+			Do this to process all the files, good for mass uploading other files, such as videos
+		run the command as "./processTempSpace.pl photos"
+			To process photos files from the photo directory, good if you want to resize the sample files
+		run the command as "./processTempSpace.pl videos"
+			To process videos files from the videos directory, good if you want to resize the sample files
+
 	photobooth-event.config
 		Example configuration file for each event
 			Event information and display
 			Image settings, including watermark (this should be an transparent image)
 			Passcode for image download
+			Ability to disable upload, useful for after the event
 
 	photobooth.css
 		CSS to control html display. a local copy on each event to fine tune the display
 
-	htaccess
+	.htaccess
 		This is an example .htaccess file that should go into the "Events/SampleEvent" directory, to prevent downloads
 			Do not add Samples and QRcodes to the list in the htaccess file
 
@@ -32,6 +53,9 @@ It requires the following
 
 
 	Directory Structure, from web home directory. This ia view of the relative paths
+		PhotoBooth/
+			.htaccess			# Should put this file in this directory with the option to disable Index, just the following line
+								Options -Indexes
 		PhotoBooth/scripts/
 			index.pl
 			photobooth-event.config
@@ -48,8 +72,12 @@ It requires the following
 			.htaccess			# This is access file for the event, take the sample and edit for this URL
 			Photos/				# Directory where the full size image file
 			Samples/			# A small version of the image file to reduce page size
+			Logos/				# Place to put the event logos or other data
 			QRcodes/			# QRcodes for each of the image file
 			TempSpace/			# Temporary storage/processing are for the incoming messages
+			Videos/				# A place to put video files for playback
+							# Use a command like to covert the video
+								ffmpeg -i Photos/file.MP4 -vcodec libx264 -vf 'scale=trunc(iw/6)*2:trunc(ih/6)*2' -crf 20 Videos/file.MP4 
 		
 There are two options of uploading
 	Email, using aliases and sendmail
